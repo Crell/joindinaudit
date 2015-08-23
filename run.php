@@ -10,23 +10,37 @@ require 'vendor/autoload.php';
 
 function run()
 {
+    fetchPages('http://api.joind.in/v2.1/events?filter=past', 'Crell\JoindIn\processEventPage');
+
+    return;
+}
+
+/**
+ *
+ *
+ * @param $initial
+ * @param callable $processor
+ * @param int $concurrency
+ */
+function fetchPages($initial, callable $processor, $concurrency = 1)
+{
     $client = getClient();
 
-    $eventPages = new \SplQueue();
-    $eventPages->enqueue('http://api.joind.in/v2.1/events?filter=past');
-    $pageProcessor = partial('Crell\JoindIn\processEventPage', $eventPages);
+    $pages = new \SplQueue();
+    $pages->enqueue($initial);
+    $pageProcessor = partial($processor, $pages);
 
-    $eventPageRequestGenerator = function (\SplQueue $pages) {
+    $pageRequestGenerator = function (\SplQueue $pages) {
         foreach ($pages as $page) {
             yield new Request('GET', $page);
         }
     };
 
-    $pool = new Pool($client, $eventPageRequestGenerator($eventPages), [
+    $pool = new Pool($client, $pageRequestGenerator($pages), [
         // Since we'll in practice not have more than one item in the queue
         // at once, a higher concurrency would terminate early.
-        'concurrency' => 1,
-        'fulfilled' => $pageProcessor,
+      'concurrency' => $concurrency,
+      'fulfilled' => $pageProcessor,
     ]);
 
     // Initiate the transfers and create a promise
@@ -34,8 +48,6 @@ function run()
 
     // Force the pool of requests to complete.
     $promise->wait();
-
-    //apply($eventPages, $pageProcessor);
 }
 
 function processEventPage(\SplQueue $pages, ResponseInterface $response, $index)
@@ -48,31 +60,42 @@ function processEventPage(\SplQueue $pages, ResponseInterface $response, $index)
 
     apply(new ConferenceFilter($events->getIterator()), function($event) {
         print "Processing Event: {$event['name']}" . PHP_EOL;
-        fetchTalksForEvent($event);
         addEventToDatabase($event);
+        fetchTalksForEvent($event);
     });
 
     print "Downloaded Events Page {$index}" . PHP_EOL;
 }
 
+function processTalkPage($event, \SplQueue $pages, ResponseInterface $response, $index)
+{
+    $talks = new TalksResponse($response);
+
+    if ($next = $talks->nextPage()) {
+        $pages->enqueue($next);
+    }
+
+    apply($talks, function($talk) use ($event) {
+        print "Processing Talk: {$talk['talk_title']}" . PHP_EOL;
+        addTalkToDatabase($event, $talk);
+    });
+
+    print "Downloaded Talk Page {$index}" . PHP_EOL;
+}
+
 function fetchTalksForEvent(array $event)
 {
-    $client = getClient();
-
     $talks_uri = isset($event['talks_uri']) ? $event['talks_uri'] : '';
 
     if (!$talks_uri) {
         return;
     }
 
-    $addTalk = partial('Crell\JoindIn\addTalkToDatabase', $event);
+    $processor = partial('\Crell\JoindIn\processTalkPage', $event);
 
-    $client->getAsync($talks_uri)
-        ->then(function(ResponseInterface $response) use ($addTalk) {
-            $talks = new TalksResponse($response);
-            apply($talks, $addTalk);
-        });
+    fetchPages($talks_uri, $processor, 1);
 }
+
 
 function addTalkToDatabase(array $event, array $talk)
 {
