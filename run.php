@@ -38,7 +38,7 @@ function run() {
     //apply($eventPages, $pageProcessor);
 }
 
-function processEventPage(\SplQueue $pages, ResponseInterface $response) {
+function processEventPage(\SplQueue $pages, ResponseInterface $response, $index) {
     $events = new EventsResponse($response);
 
     if ($next = $events->nextPage()) {
@@ -46,7 +46,7 @@ function processEventPage(\SplQueue $pages, ResponseInterface $response) {
     }
 
     apply(new ConferenceFilter($events->getIterator()), function($event) {
-        print_r($event);
+        //print_r($event);
 
 
 
@@ -55,22 +55,29 @@ function processEventPage(\SplQueue $pages, ResponseInterface $response) {
         //fetchTalksForEvent($event);
     });
 
+    print "Downloaded Events Page {$index}" . PHP_EOL;
 }
 
 
 function addEventToDatabase(array $event) {
+    $conn = getDb();
 
-}
-
-
-function getClient() {
-    static $client;
-
-    if (empty($client)) {
-        $client = new Client(['headers' => ['X-Foo' => 'Bar']]);
+    try {
+        $conn->insert('event', [
+          'url_friendly_name' => $event['url_friendly_name'],
+          'name' => $event['name'],
+          'start_date' => $event['start_date'],
+          'end_date' => $event['end_date'],
+          'tz_continent' => $event['tz_continent'],
+          'tz_place' => $event['tz_place'],
+          'location' => $event['location'],
+          'talks_count' => $event['talks_count'],
+        ]);
     }
-
-    return $client;
+    catch (\Exception $e) {
+        print $e->getMessage() . PHP_EOL;
+        print_r($event);
+    }
 }
 
 run();

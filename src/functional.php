@@ -1,6 +1,7 @@
 <?php
 
-function partial(callable $func, $arg1) {
+function partial(callable $func, $arg1)
+{
     $func_args = func_get_args();
     $args = array_slice($func_args, 1);
 
@@ -10,8 +11,22 @@ function partial(callable $func, $arg1) {
     };
 }
 
-function apply(\Traversable $traversable, callable $callback) {
+function apply(\Traversable $traversable, callable $callback)
+{
     foreach ($traversable as $item) {
         $callback($item);
     }
+}
+
+function memoize($function)
+{
+    return function() use ($function) {
+        static $results = array();
+        $args = func_get_args();
+        $key = serialize($args);
+        if (empty($results[$key])) {
+            $results[$key] = call_user_func_array($function, $args);
+        }
+        return $results[$key];
+    };
 }

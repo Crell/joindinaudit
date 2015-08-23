@@ -20,7 +20,8 @@
             "Crell\\JoindIn\\": "src/"
         },
         "files": [
-            "src/functional.php"
+            "src/functional.php",
+            "src/util.php"
         ]
     }
 }

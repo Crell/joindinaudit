@@ -7,22 +7,14 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\Schema;
 
 function init() {
-
-    $config = new Configuration();
-
-    $connectionParams = array(
-      'url' => 'mysql://test:test@localhost/joindin',
-    );
-
-    /** @var \Doctrine\DBAL\Connection $conn */
-    $conn = DriverManager::getConnection($connectionParams, $config);
+    $conn = getDb();
 
     /** @var \Doctrine\DBAL\Schema\AbstractSchemaManager $sm */
     $sm = $conn->getSchemaManager();
     $schema = new Schema();
 
     $table = $schema->createTable('event');
-    $table->addColumn("stub", "string", ["length" => 128]);
+    $table->addColumn("url_friendly_name", "string", ["length" => 128]);
     $table->addColumn("name", "string", ["length" => 128]);
     $table->addColumn("start_date", "date");
     $table->addColumn("end_date", "date");
@@ -31,7 +23,7 @@ function init() {
     $table->addColumn("location", "string", ["length" => 64]);
     $table->addColumn("talks_count", "integer", ["unsigned" => true]);
 
-    $table->setPrimaryKey(["stub"]);
+    $table->setPrimaryKey(["url_friendly_name"]);
 //    $table->addUniqueIndex(["username"]);
 //    $schema->createSequence("users_seq");
     $sm->dropAndCreateTable($table);
