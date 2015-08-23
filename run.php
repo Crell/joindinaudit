@@ -3,6 +3,9 @@
 namespace Crell\JoindIn;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Pool;
+use GuzzleHttp\Psr7\Request;
+use Psr\Http\Message\ResponseInterface;
 
 require 'vendor/autoload.php';
 
@@ -11,18 +14,31 @@ function run() {
 
     $eventPages = new \SplQueue();
     $eventPages->enqueue('http://api.joind.in/v2.1/events?filter=past');
-    $pageProcessor = partial('Crell\JoindIn\processEventPage', $client, $eventPages);
+    $pageProcessor = partial('Crell\JoindIn\processEventPage', $eventPages);
 
-    apply($eventPages, $pageProcessor);
+    $eventPageRequestGenerator = function (\SplQueue $pages) {
+        foreach ($pages as $page) {
+            yield new Request('GET', $page);
+        }
+    };
+
+    $pool = new Pool($client, $eventPageRequestGenerator($eventPages), [
+        // Since we'll in practice not have more than one item in the queue
+        // at once, a higher concurrency would terminate early.
+        'concurrency' => 1,
+        'fulfilled' => $pageProcessor,
+    ]);
+
+    // Initiate the transfers and create a promise
+    $promise = $pool->promise();
+
+    // Force the pool of requests to complete.
+    $promise->wait();
+
+    //apply($eventPages, $pageProcessor);
 }
 
-
-
-function processEventPage(Client $client, \SplQueue $pages, $page) {
-    $response = $client->get($page);
-    if ($response->getStatusCode() !== 200) {
-        return;
-    }
+function processEventPage(\SplQueue $pages, ResponseInterface $response) {
     $events = new EventsResponse($response);
 
     if ($next = $events->nextPage()) {
@@ -40,6 +56,7 @@ function processEventPage(Client $client, \SplQueue $pages, $page) {
     });
 
 }
+
 
 function addEventToDatabase(array $event) {
 
