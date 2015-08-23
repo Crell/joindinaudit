@@ -2,8 +2,6 @@
 
 require 'vendor/autoload.php';
 
-use Doctrine\DBAL\Configuration;
-use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\Schema;
 
 function init() {
@@ -11,8 +9,12 @@ function init() {
 
     /** @var \Doctrine\DBAL\Schema\AbstractSchemaManager $sm */
     $sm = $conn->getSchemaManager();
-    $schema = new Schema();
 
+    if ($sm->tablesExist('talk')) {
+        $sm->dropTable('talk');
+    }
+
+    $schema = new Schema();
     $table = $schema->createTable('event');
     $table->addColumn("url_friendly_name", "string", ["length" => 128]);
     $table->addColumn("name", "string", ["length" => 128]);
@@ -22,21 +24,25 @@ function init() {
     $table->addColumn("tz_place", "string", ["length" => 64]);
     $table->addColumn("location", "string", ["length" => 64]);
     $table->addColumn("talks_count", "integer", ["unsigned" => true]);
-
     $table->setPrimaryKey(["url_friendly_name"]);
 //    $table->addUniqueIndex(["username"]);
 //    $schema->createSequence("users_seq");
     $sm->dropAndCreateTable($table);
 
-    /*
-    $table = $schema->createTable('messages');
-    $table->addColumn("id", "integer", ["unsigned" => true]);
-    $table->addColumn("author", "string", ["length" => 32]);
-    $table->addColumn("parent", "integer", ["unsigned" => true]);
-    $table->addColumn("message", "string", ["length" => 256]);
-    $table->setPrimaryKey(["id"]);
+    $schema = new Schema();
+    $table = $schema->createTable('talk');
+    $table->addColumn("url_friendly_talk_title", "string", ["length" => 128]);
+    $table->addColumn("event", "string", ["length" => 64]);
+    $table->addColumn("talk_title", "string", ["length" => 128]);
+    $table->addColumn("type", "string", ["length" => 128]);
+    $table->addColumn("duration", "integer", ["unsigned" => true]);
+    $table->addColumn("speaker", "string", ["length" => 128]);
+    $table->addColumn("average_rating", "integer", ["unsigned" => true]);
+    $table->setPrimaryKey(["url_friendly_talk_title", 'event']);
+    $table->addForeignKeyConstraint('event', ['event'], ['url_friendly_name']);
     $sm->dropAndCreateTable($table);
-*/
+
+
 }
 
 init();
