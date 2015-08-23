@@ -13,13 +13,14 @@
     ],
     "require": {
         "guzzlehttp/guzzle": "^6.0",
-        "doctrine/dbal": "^2.5",
-        "symfony/console": "^2.7",
-        "cilex/cilex": "^1.1"
+        "doctrine/dbal": "^2.5"
     },
     "autoload": {
         "psr-4": {
             "Crell\\JoindIn\\": "src/"
-        }
+        },
+        "files": [
+            "src/functional.php"
+        ]
     }
 }

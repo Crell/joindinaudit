@@ -11,20 +11,38 @@ function run() {
 
     $eventPages = new \SplQueue();
     $eventPages->enqueue('http://api.joind.in/v2.1/events?filter=past');
+    $pageProcessor = partial('Crell\JoindIn\processEventPage', $client, $eventPages);
 
-    foreach ($eventPages as $page) {
-        $response = $client->get($page);
-        if ($response->getStatusCode() !== 200) {
-            continue;
-        }
-        $events = new EventsResponse($response);
-        foreach (new ConferenceFilter($events->getIterator()) as $event) {
-            print_r($event);
-        }
-        if ($next = $events->nextPage()) {
-            $eventPages->enqueue($next);
-        }
+    apply($eventPages, $pageProcessor);
+}
+
+
+
+function processEventPage(Client $client, \SplQueue $pages, $page) {
+    $response = $client->get($page);
+    if ($response->getStatusCode() !== 200) {
+        return;
     }
+    $events = new EventsResponse($response);
+
+    if ($next = $events->nextPage()) {
+        $pages->enqueue($next);
+    }
+
+    apply(new ConferenceFilter($events->getIterator()), function($event) {
+        print_r($event);
+
+
+
+        addEventToDatabase($event);
+
+        //fetchTalksForEvent($event);
+    });
+
+}
+
+function addEventToDatabase(array $event) {
+
 }
 
 
