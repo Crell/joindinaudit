@@ -7,24 +7,23 @@ use GuzzleHttp\Client;
 require 'vendor/autoload.php';
 
 function run() {
-    loadEvents(getClient(), 'http://api.joind.in/v2.1/events?filter=past');
+    $client = getClient();
 
-}
+    $eventPages = new \SplQueue();
+    $eventPages->enqueue('http://api.joind.in/v2.1/events?filter=past');
 
-function loadEvents(Client $client, $url) {
-    $response = $client->get($url);
-
-    if ($response->getStatusCode() != 200) {
-        return;
-    }
-
-    $events = new EventsResponse($response);
-
-    foreach (new ConferenceFilter($events->getIterator()) as $event) {
-        print_r($event);
-    }
-    if ($next = $events->nextPage()) {
-        return loadEvents($client, $next);
+    foreach ($eventPages as $page) {
+        $response = $client->get($page);
+        if ($response->getStatusCode() !== 200) {
+            continue;
+        }
+        $events = new EventsResponse($response);
+        foreach (new ConferenceFilter($events->getIterator()) as $event) {
+            print_r($event);
+        }
+        if ($next = $events->nextPage()) {
+            $eventPages->enqueue($next);
+        }
     }
 }
 
