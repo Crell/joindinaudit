@@ -5,7 +5,7 @@ use Doctrine\DBAL\DriverManager;
 use GuzzleHttp\Client;
 
 /**
- *
+ * Returns a database connection.
  *
  * @return \Doctrine\DBAL\Connection
  * @throws \Doctrine\DBAL\DBALException
@@ -28,7 +28,7 @@ function getDb() {
 }
 
 /**
- *
+ * Returns a new Guzzle client, configured for JoindIn.
  *
  * @return \GuzzleHttp\Client
  */

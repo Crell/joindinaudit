@@ -4,7 +4,11 @@ require 'vendor/autoload.php';
 
 use Doctrine\DBAL\Schema\Schema;
 
-function init() {
+/**
+ * Initializes the database with a fresh, empty schema.
+ */
+function init()
+{
     $conn = getDb();
 
     /** @var \Doctrine\DBAL\Schema\AbstractSchemaManager $sm */
@@ -41,8 +45,6 @@ function init() {
     $table->setPrimaryKey(["url_friendly_talk_title", 'event']);
     $table->addForeignKeyConstraint('event', ['event'], ['url_friendly_name']);
     $sm->dropAndCreateTable($table);
-
-
 }
 
 init();
