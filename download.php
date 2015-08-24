@@ -80,8 +80,10 @@ function processEventPage(\SplQueue $pages, ResponseInterface $response, $index)
 
     apply(new ConferenceFilter($events->getIterator()), function($event) {
         print "Processing Event: {$event['name']}" . PHP_EOL;
-        addEventToDatabase($event);
-        fetchTalksForEvent($event);
+        if (addEventToDatabase($event)) {
+            fetchTalksForEvent($event);
+        }
+
     });
 
     print "Downloaded Events Page {$index}" . PHP_EOL;
@@ -111,11 +113,11 @@ function processTalkPage(array $event, \SplQueue $pages, ResponseInterface $resp
     }
 
     apply($talks, function($talk) use ($event) {
-        print "Processing Talk: {$talk['talk_title']}" . PHP_EOL;
+        //print "Processing Talk: {$talk['talk_title']}" . PHP_EOL;
         addTalkToDatabase($event, $talk);
     });
 
-    print "Downloaded Talk Page {$index}" . PHP_EOL;
+    //print "Downloaded Talk Page {$index}" . PHP_EOL;
 }
 
 /**
@@ -147,7 +149,6 @@ function fetchTalksForEvent(array $event)
  */
 function addTalkToDatabase(array $event, array $talk)
 {
-    print "Processing Talk: {$talk['talk_title']}" . PHP_EOL;
     $conn = getDb();
 
     $fields = ['uri', 'url_friendly_talk_title', 'talk_title', 'type', 'duration', 'average_rating'];
@@ -200,7 +201,7 @@ function addEventToDatabase(array $event)
 
     $insert = [];
     foreach ($fields as $field) {
-        $insert[$field] = $event[$field];
+        $insert[$field] = isset($event[$field]) ? $event[$field] : '';
     }
 
     try {
@@ -209,7 +210,10 @@ function addEventToDatabase(array $event)
     catch (\Exception $e) {
         print $e->getMessage() . PHP_EOL;
         print_r($event);
+        return false;
     }
+
+    return true;
 }
 
 download();
