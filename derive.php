@@ -2,10 +2,7 @@
 
 require 'vendor/autoload.php';
 
-use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Statement;
-use Crell\HtmlModel\HtmlPage;
 
 /**
  * Computes derivative data from the raw information.
