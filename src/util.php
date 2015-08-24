@@ -42,6 +42,21 @@ function getClient() {
     return $client;
 }
 
+/**
+ * Produces an HTML table based on the provided values.
+ *
+ * @param $caption
+ *   The table caption.
+ * @param array $header
+ *   A simple array to use for the header row of the table.
+ * @param array $rows
+ *   A 2D array of values to show in the table.
+ * @param array $footer
+ *   (Optional) A footer row to include at the bottom of the table.
+ *
+ * @return string
+ *   A formatted HTML table.
+ */
 function makeHtmlTable($caption, array $header, array $rows, array $footer = [])
 {
     $output = "<table>\n<caption>{$caption}</caption>\n";
