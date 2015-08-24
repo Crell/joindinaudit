@@ -9,12 +9,9 @@ use Doctrine\DBAL\Connection;
  */
 function derive()
 {
-    $conn = getDb();
-
-    //makeFirstAppearanceIndex();
+    makeFirstAppearanceIndex();
     computeSpeakersPerCon();
     computeNewSpeakersPerCon();
-
 }
 
 function computeSpeakersPerCon()
