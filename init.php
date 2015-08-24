@@ -32,6 +32,7 @@ function init()
     $table->addColumn("tz_place", "string", ["length" => 64]);
     $table->addColumn("location", "string", ["length" => 64]);
     $table->addColumn("talks_count", "integer", ["unsigned" => true]);
+    $table->addColumn('num_speakers', 'integer', ['unsigned' => true]);
     $table->addColumn('new_speakers', 'integer', ['unsigned' => true]);
     $table->setPrimaryKey(["uri"]);
 //    $table->addUniqueIndex(["username"]);

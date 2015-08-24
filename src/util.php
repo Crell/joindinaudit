@@ -2,6 +2,7 @@
 
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Statement;
 use GuzzleHttp\Client;
 
 /**
@@ -41,3 +42,24 @@ function getClient() {
 
     return $client;
 }
+
+function makeHtmlTable($caption, array $header, array $rows)
+{
+    $output = "<table>\n<caption>{$caption}</caption>\n";
+
+    $output .= "<thead><tr>" . implode('', array_map(function($element) {
+        return "<th>$element</th>";
+    }, $header))
+    . "</tr></thead>\n";
+
+    $output .= "<tbody>" . implode('', array_map(function(array $row) {
+          return "<tr>" . implode('', array_map(function($element) {
+              return "<td>$element</td>";
+          }, $row))
+          . "</tr>\n";
+    }, $rows))
+    . "</tbody>\n";
+
+    return $output;
+}
+
