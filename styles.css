@@ -1,0 +1,20 @@
+table {
+    margin: 2em;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+table > caption {
+    font-weight: bold;
+    font-size: 2em;
+}
+
+thead th {
+    text-decoration: underline;
+    text-wrap: none;
+}
+
+tfoot td {
+    border-top: 1px dotted black;
+    font-style: italic;
+}

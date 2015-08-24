@@ -61,7 +61,7 @@ function makeHtmlTable($caption, array $header, array $rows, array $footer = [])
 
     if ($footer) {
         $output .= "<tfoot><tr>" . implode('', array_map(function($element) {
-              return "<th>$element</th>";
+              return "<td>$element</td>";
           }, $footer))
           . "</tr></tfoot>\n";
     }

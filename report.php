@@ -3,14 +3,16 @@
 require 'vendor/autoload.php';
 
 use Crell\HtmlModel\HtmlPage;
+use Crell\HtmlModel\Head\StyleLinkElement;
 
 /**
  * Generates an HTML report of the data.
  */
 function report()
 {
-    $page = new HtmlPage();
-    $page = $page->withTitle('Conference audit');
+    $page = (new HtmlPage())
+        ->withTitle('Conference audit')
+      ->withStyleLink(new StyleLinkElement('styles.css'));
 
     // Generate the results page.
     $table = reportNewSpeakersPerCon();
@@ -43,24 +45,24 @@ function reportNewSpeakersPerCon()
 {
     $conn = getDb();
 
-    $stmt = $conn->executeQuery("SELECT event.start_date, event.name, talks_count, num_speakers, new_speakers, FORMAT((new_speakers/event.num_speakers)*100, 1) AS percent_new
+    $sql = "SELECT event.start_date, event.name, talks_count, num_speakers, new_speakers, FORMAT((new_speakers/event.num_speakers)*100, 1) AS percent_new
         FROM event
         WHERE start_date >= '2011-01-01'
-        ORDER BY start_date");
+        ORDER BY start_date";
+
+    $stmt = $conn->executeQuery($sql);
+
+    $rows = $stmt->fetchAll();
 
     $header = ['Date', 'Event', 'Total sessions', 'Speakers', 'New speakers', 'Percent new'];
 
-    $table = makeHtmlTable('First time speakers', $header, $stmt->fetchAll());
+    $stmt = $conn->executeQuery("SELECT 'N/A', 'Average', FORMAT(AVG(talks_count), 1), FORMAT(AVG(num_speakers), 1), FORMAT(AVG(new_speakers), 1), FORMAT(AVG(percent_new), 1) FROM ({$sql}) AS stuff");
 
-    $stmt = $conn->executeQuery("SELECT FORMAT(AVG(percent_new), 1) FROM (
-        SELECT event.start_date, event.name, talks_count, num_speakers, new_speakers, FORMAT((new_speakers/event.num_speakers)*100, 1) AS percent_new
-        FROM event
-        WHERE start_date >= '2011-01-01'
-        ORDER BY start_date) AS stuff");
+    $averages = $stmt->fetch();
 
-    $average = $stmt->fetchColumn();
+    return makeHtmlTable('First time speakers', $header, $rows, $averages);
 
-    return $table . "<p>Average new speaker percentage: {$average}</p>\n";
+    //return $table . "<p>Average new speaker percentage: {$average}</p>\n";
 }
 
 report();
