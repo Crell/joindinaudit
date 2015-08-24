@@ -4,8 +4,59 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "81070d1c3696282952cb257831d5d0ff",
+    "hash": "669dae74b7be4e426cb3b85489de00f0",
     "packages": [
+        {
+            "name": "crell/htmlmodel",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Crell/HtmlModel.git",
+                "reference": "e330d2239580aeb8fcb0085e0f14aa721bdd548c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Crell/HtmlModel/zipball/e330d2239580aeb8fcb0085e0f14aa721bdd548c",
+                "reference": "e330d2239580aeb8fcb0085e0f14aa721bdd548c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "codeclimate/php-test-reporter": "dev-master",
+                "phpunit/phpunit": "4.*"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Crell\\HtmlModel\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Larry Garfield",
+                    "email": "larry@garfieldtech.com",
+                    "homepage": "http://www.garfieldtech.com/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Domain value objects for modeling HTML pages",
+            "homepage": "https://github.com/Crell/HtmlModel",
+            "keywords": [
+                "html"
+            ],
+            "time": "2015-07-12 23:59:03"
+        },
         {
             "name": "doctrine/annotations",
             "version": "v1.2.6",
@@ -699,7 +750,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "crell/htmlmodel": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
