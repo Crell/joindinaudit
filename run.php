@@ -150,7 +150,7 @@ function addTalkToDatabase(array $event, array $talk)
     print "Processing Talk: {$talk['talk_title']}" . PHP_EOL;
     $conn = getDb();
 
-    $fields = ['url_friendly_talk_title', 'talk_title', 'type', 'duration', 'average_rating'];
+    $fields = ['uri', 'url_friendly_talk_title', 'talk_title', 'type', 'duration', 'average_rating'];
 
     $insert = [];
     foreach ($fields as $field) {
@@ -158,7 +158,7 @@ function addTalkToDatabase(array $event, array $talk)
     }
 
     $insert['speaker'] = getSpeaker($talk);
-    $insert['event'] = $event['url_friendly_name'];
+    $insert['event_uri'] = $event['uri'];
 
     try {
         $conn->insert('talk', $insert);
@@ -195,7 +195,7 @@ function addEventToDatabase(array $event)
 {
     $conn = getDb();
 
-    $fields = ['url_friendly_name', 'name', 'start_date', 'end_date',
+    $fields = ['uri', 'url_friendly_name', 'name', 'start_date', 'end_date',
       'tz_continent', 'tz_place', 'location', 'talks_count'];
 
     $insert = [];
