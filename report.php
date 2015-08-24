@@ -61,8 +61,6 @@ function reportNewSpeakersPerCon()
     $averages = $stmt->fetch();
 
     return makeHtmlTable('First time speakers', $header, $rows, $averages);
-
-    //return $table . "<p>Average new speaker percentage: {$average}</p>\n";
 }
 
 report();
