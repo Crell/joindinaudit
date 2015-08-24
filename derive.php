@@ -8,45 +8,17 @@ use Doctrine\DBAL\Statement;
 use Crell\HtmlModel\HtmlPage;
 
 /**
- * Initializes the database with a fresh, empty schema.
+ * Computes derivative data from the raw information.
  */
-function audit()
+function derive()
 {
     $conn = getDb();
 
-    // Calculate data!
     //makeFirstAppearanceIndex();
     computeSpeakersPerCon();
     computeNewSpeakersPerCon();
 
-    // Generate the results page.
-    $table = reportNewSpeakersPerCon();
-
-    $page = new HtmlPage($table);
-    $page->withTitle('Conference audit');
-
-    file_put_contents('results.html', $page);
 }
-
-
-function reportNewSpeakersPerCon()
-{
-    $conn = getDb();
-
-    $queryBuilder = $conn->createQueryBuilder();
-
-
-    $stmt = $conn->executeQuery("SELECT event.start_date, event.name, talks_count, num_speakers, new_speakers, FORMAT((new_speakers/event.num_speakers)*100, 1) AS percent_new
-        FROM event
-        WHERE start_date >= '2011-01-01'
-        ORDER BY start_date");
-
-    $header = ['Date', 'Event', 'Total sessions', 'Speakers', 'New speakers', 'Percent new'];
-
-    return makeHtmlTable('First time speakers', $header, $stmt->fetchAll());
-
-}
-
 
 function computeSpeakersPerCon()
 {
@@ -121,4 +93,4 @@ function makeFirstAppearanceIndex()
 
 }
 
-audit();
+derive();
