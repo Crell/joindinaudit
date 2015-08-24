@@ -16,12 +16,13 @@ function getDb() {
     if (empty($conn)) {
         $config = new Configuration();
 
-        $connectionParams = array(
-          'url' => 'mysql://test:test@localhost/joindin',
-        );
+        $db_url = getenv('joinedin_db');
+        if (!$db_url) {
+            die('No database information has been defined. Be sure to set the \'joindin_db\' environment variable to the Doctrine DB URL to use.');
+        }
 
         /** @var \Doctrine\DBAL\Connection $conn */
-        $conn = DriverManager::getConnection($connectionParams, $config);
+        $conn = DriverManager::getConnection(['url' => $db_url], $config);
     }
 
     return $conn;
