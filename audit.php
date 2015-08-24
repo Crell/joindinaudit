@@ -16,6 +16,33 @@ function audit()
     //ensureFirstAppearanceTable();
     //makeFirstAppearanceIndex();
 
+    reportNewSpeakersPerCon();
+
+}
+
+function reportNewSpeakersPerCon()
+{
+    $conn = getDb();
+
+    $result = $conn->executeQuery("SELECT DISTINCT url_friendly_name, name, start_date
+      FROM event
+      WHERE start_date >= '2011-01-01'
+      ORDER BY start_date");
+
+    $stmt = $conn->prepare("SELECT COUNT(*) FROM (SELECT DISTINCT talk.speaker
+            FROM event
+              INNER JOIN talk ON event.url_friendly_name = talk.event
+              INNER JOIN first_appearance ON event.url_friendly_name=first_appearance.event
+                                             AND talk.speaker=first_appearance.speaker
+            WHERE event.url_friendly_name = :event) AS stuff");
+
+    foreach ($result as $event) {
+        $stmt->execute(['event' => $event['url_friendly_name']]);
+
+        $count = $stmt->fetchColumn();
+
+        printf("%s: %s\t%d\n", $event['start_date'], $event['name'], $count);
+    }
 }
 
 function ensureFirstAppearanceTable()
@@ -47,14 +74,13 @@ function makeFirstAppearanceIndex()
     $conn->transactional(function(Connection $conn) {
         $result = $conn->executeQuery("SELECT DISTINCT speaker FROM talk");
 
-        $sql = "INSERT INTO first_appearance
+        $stmt = $conn->prepare("INSERT INTO first_appearance
                 SELECT talk.speaker as speaker, event.url_friendly_name as event, event.start_date as event_date, event.name as event_name
                 FROM event
                   INNER JOIN talk ON event.url_friendly_name = talk.event
                 WHERE talk.speaker = :name
                 ORDER BY event.start_date
-                LIMIT 1";
-        $stmt = $conn->prepare($sql);
+                LIMIT 1");
 
         foreach ($result as $record) {
             $stmt->execute([
