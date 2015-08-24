@@ -11,7 +11,7 @@ require 'vendor/autoload.php';
 /**
  * Executes the downloader.
  */
-function run()
+function download()
 {
     fetchPages('http://api.joind.in/v2.1/events?filter=past', 'Crell\JoindIn\processEventPage');
 
@@ -212,4 +212,4 @@ function addEventToDatabase(array $event)
     }
 }
 
-run();
+download();
