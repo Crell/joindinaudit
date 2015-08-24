@@ -42,7 +42,7 @@ function getClient() {
     return $client;
 }
 
-function makeHtmlTable($caption, array $header, array $rows)
+function makeHtmlTable($caption, array $header, array $rows, array $footer = [])
 {
     $output = "<table>\n<caption>{$caption}</caption>\n";
 
@@ -59,6 +59,41 @@ function makeHtmlTable($caption, array $header, array $rows)
     }, $rows))
     . "</tbody>\n";
 
+    if ($footer) {
+        $output .= "<tfoot><tr>" . implode('', array_map(function($element) {
+              return "<th>$element</th>";
+          }, $footer))
+          . "</tr></tfoot>\n";
+    }
+
+    $output .= "</table>\n";
+
     return $output;
 }
 
+class HtmlTable {
+
+    private $header;
+
+    private $caption;
+
+    private $rows;
+
+    private $footer;
+
+    public function __construct($caption, $header, $rows)
+    {
+        $this->caption = $caption;
+        $this->header = $header;
+        $this->rows = $rows;
+    }
+
+    public function setFooter($footer) {
+        $this->footer = $footer;
+    }
+
+    public function __toString()
+    {
+        return makeHtmlTable($this->caption, $this->header, $this->rows, $this->footer);
+    }
+}
