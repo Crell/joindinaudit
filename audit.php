@@ -16,7 +16,21 @@ function audit()
     //ensureFirstAppearanceTable();
     //makeFirstAppearanceIndex();
 
-    reportNewSpeakersPerCon();
+
+    computeNewSpeakersPerCon();
+
+}
+
+function computeNewSpeakersPerCon()
+{
+    $conn = getDb();
+
+    $conn->executeQuery("UPDATE event SET new_speakers = (SELECT COUNT(*) FROM (SELECT DISTINCT talk.speaker
+            FROM event e2
+              INNER JOIN talk ON event.url_friendly_name = talk.event
+              INNER JOIN first_appearance ON event.url_friendly_name=first_appearance.event
+                                             AND talk.speaker=first_appearance.speaker
+            WHERE e2.url_friendly_name = event.url_friendly_name) AS stuff)");
 
 }
 
@@ -24,7 +38,7 @@ function reportNewSpeakersPerCon()
 {
     $conn = getDb();
 
-    $result = $conn->executeQuery("SELECT DISTINCT url_friendly_name, name, start_date
+    $result = $conn->executeQuery("SELECT DISTINCT url_friendly_name, name, start_date, talks_count
       FROM event
       WHERE start_date >= '2011-01-01'
       ORDER BY start_date");
@@ -41,7 +55,7 @@ function reportNewSpeakersPerCon()
 
         $count = $stmt->fetchColumn();
 
-        printf("%s: %s\t%d\n", $event['start_date'], $event['name'], $count);
+        printf("%s: %s\t%d of %d\n", $event['start_date'], $event['name'], $count, $event['talks_count']);
     }
 }
 
