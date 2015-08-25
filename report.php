@@ -4,6 +4,7 @@ require 'vendor/autoload.php';
 
 use Crell\HtmlModel\Head\StyleElement;
 use Crell\HtmlModel\HtmlPage;
+use Crell\JoindIn\HtmlTable;
 
 /**
  * Generates an HTML report of the data.
@@ -15,11 +16,9 @@ function report()
       ->withInlineStyle(new StyleElement(file_get_contents('styles.css')));
 
     // Generate the results page.
-    $table = reportNewSpeakersPerCon();
-    $page = $page->withContent($page->getContent() . $table);
+    $page = $page->withContent($page->getContent() . reportNewSpeakersPerCon());
 
-    $table = reportTopSpeakers();
-    $page = $page->withContent($page->getContent() . $table);
+    $page = $page->withContent($page->getContent() . reportTopSpeakers());
 
     file_put_contents('results.html', $page);
 }
@@ -37,7 +36,12 @@ function reportTopSpeakers()
 
     $header = ['Speaker', 'Appearances (since 2011)'];
 
-    return makeHtmlTable('Most frequent speakers', $header, $stmt->fetchAll());
+    $table = new HtmlTable('Most frequent speakers');
+    $table
+      ->setRows($stmt->fetchAll())
+      ->addHeader($header);
+
+    return $table;
 }
 
 
@@ -67,7 +71,13 @@ function reportNewSpeakersPerCon()
 
     $averages = $stmt->fetch();
 
-    return makeHtmlTable('First time speakers', $header, $rows, $averages);
+    $table = new HtmlTable('First time speakers');
+    $table
+      ->setRows($rows)
+      ->addHeader($header)
+      ->addFooter($averages);
+
+    return $table;
 }
 
 report();
