@@ -24,24 +24,24 @@ h2. Usage
 
 There are four scripts to run, in the repository root:
 
-h3. `init.php`
+h3. `php init.php`
 
 Run this once to create the database tables in the database defined above. You
 will need to run it once before each time you run `download.php`, as that script
 needs an empty database.
 
-h3. `download.php`
+h3. `php download.php`
 
 Run this to download the full available dataset from Joind.in.  It will provide
 some basic output along the way.  On my system it takes about 4 minutes, but 
 your download speed may vary.
 
-h3. `derive.php`
+h3. `php derive.php`
 
 This script generates some derived data that is slow to calculate, and stores
 it in the database.  It generates no output when everything works properly.
 
-h3. `report.php`
+h3. `php report.php`
 
 This script actually produces the report output. It produces a very simple HTML
 page called report.html, in the project root.  That's where all the useful 
