@@ -49,7 +49,7 @@ function reportNewSpeakersPerCon()
 {
     $conn = getDb();
 
-    $sql = "SELECT event.start_date, event.name, talks_count, num_speakers, new_speakers, FORMAT((new_speakers/event.num_speakers)*100, 1) AS percent_new
+    $sql = "SELECT event.start_date, event.name, tz_continent, talks_count, num_speakers, new_speakers, FORMAT((new_speakers/event.num_speakers)*100, 1) AS percent_new
         FROM event
         WHERE start_date >= '2010-01-01'
         ORDER BY start_date";
@@ -61,21 +61,32 @@ function reportNewSpeakersPerCon()
     $header = [
       'Date',
       'Event',
+      'Region',
       'Total sessions',
       'Speakers',
       'New speakers',
       'Percent new'
     ];
 
-    $stmt = $conn->executeQuery("SELECT 'N/A', 'Average', FORMAT(AVG(talks_count), 1), FORMAT(AVG(num_speakers), 1), FORMAT(AVG(new_speakers), 1), FORMAT(AVG(percent_new), 1) FROM ({$sql}) AS stuff");
-
-    $averages = $stmt->fetch();
-
     $table = new HtmlTable('First time speakers');
     $table
       ->setRows($rows)
-      ->addHeader($header)
-      ->addFooter($averages);
+      ->addHeader($header);
+
+    $continent_stmt = $conn->executeQuery("SELECT DISTINCT tz_continent FROM event WHERE tz_continent <> '' ORDER BY tz_continent");
+
+    foreach ($continent_stmt as $continent) {
+        $averages = $conn->executeQuery(
+          "SELECT 'N/A', 'Average', '{$continent['tz_continent']}',
+             FORMAT(AVG(talks_count), 1), FORMAT(AVG(num_speakers), 1), FORMAT(AVG(new_speakers), 1), FORMAT(AVG(percent_new), 1)
+             FROM (SELECT event.start_date, event.name, tz_continent, talks_count, num_speakers, new_speakers, FORMAT((new_speakers/event.num_speakers)*100, 1) AS percent_new
+              FROM event
+              WHERE start_date >= '2010-01-01'
+                AND tz_continent = '{$continent['tz_continent']}'
+              ORDER BY start_date) AS stuff")->fetch();
+        $table->addFooter($averages);
+    }
+
 
     return $table;
 }
