@@ -42,7 +42,7 @@ it in the database.  It generates no output when everything works properly.
 ### `php report.php`
 
 This script actually produces the report output. It produces a very simple HTML
-page called report.html, in the project root.  That's where all the useful 
+page called results.html, in the project root.  That's where all the useful 
 data can be seen. :-)
 
 ## Contributing
