@@ -47,7 +47,7 @@ function reportNewSpeakersPerCon()
 
     $sql = "SELECT event.start_date, event.name, talks_count, num_speakers, new_speakers, FORMAT((new_speakers/event.num_speakers)*100, 1) AS percent_new
         FROM event
-        WHERE start_date >= '2011-01-01'
+        WHERE start_date >= '2010-01-01'
         ORDER BY start_date";
 
     $stmt = $conn->executeQuery($sql);
