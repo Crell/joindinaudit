@@ -16,7 +16,7 @@ function getDb() {
     if (empty($conn)) {
         $config = new Configuration();
 
-        $db_url = getenv('joinedin_db');
+        $db_url = getenv('joindin_db');
         if (!$db_url) {
             die('No database information has been defined. Be sure to set the \'joindin_db\' environment variable to the Doctrine DB URL to use.');
         }
