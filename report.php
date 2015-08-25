@@ -2,8 +2,8 @@
 
 require 'vendor/autoload.php';
 
+use Crell\HtmlModel\Head\StyleElement;
 use Crell\HtmlModel\HtmlPage;
-use Crell\HtmlModel\Head\StyleLinkElement;
 
 /**
  * Generates an HTML report of the data.
@@ -11,8 +11,8 @@ use Crell\HtmlModel\Head\StyleLinkElement;
 function report()
 {
     $page = (new HtmlPage())
-        ->withTitle('Conference audit')
-      ->withStyleLink(new StyleLinkElement('styles.css'));
+      ->withTitle('Conference audit')
+      ->withInlineStyle(new StyleElement(file_get_contents('styles.css')));
 
     // Generate the results page.
     $table = reportNewSpeakersPerCon();
@@ -37,7 +37,7 @@ function reportTopSpeakers()
 
     $header = ['Speaker', 'Appearances (since 2011)'];
 
-    return makeHtmlTable('Most popular speakers', $header, $stmt->fetchAll());
+    return makeHtmlTable('Most frequent speakers', $header, $stmt->fetchAll());
 }
 
 
@@ -54,7 +54,14 @@ function reportNewSpeakersPerCon()
 
     $rows = $stmt->fetchAll();
 
-    $header = ['Date', 'Event', 'Total sessions', 'Speakers', 'New speakers', 'Percent new'];
+    $header = [
+      'Date',
+      'Event',
+      'Total sessions',
+      'Speakers',
+      'New speakers',
+      'Percent new'
+    ];
 
     $stmt = $conn->executeQuery("SELECT 'N/A', 'Average', FORMAT(AVG(talks_count), 1), FORMAT(AVG(num_speakers), 1), FORMAT(AVG(new_speakers), 1), FORMAT(AVG(percent_new), 1) FROM ({$sql}) AS stuff");
 
