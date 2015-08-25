@@ -6,8 +6,7 @@ and running some basic analysis on it.  For more background, see my blog post:
 
 http://www.garfieldtech.com/blog/php-conference-data
 
-h2. Setup
------
+## Setup
 
 Clone down the repository, then run `composer install` to grab a few dependencies.
 
@@ -19,36 +18,34 @@ database.
 $ export joindin_db=mysql://user:pass@localhost/yourdbname
 ````
 
-h2. Usage
------
+## Usage
 
 There are four scripts to run, in the repository root:
 
-h3. `php init.php`
+### `php init.php`
 
 Run this once to create the database tables in the database defined above. You
 will need to run it once before each time you run `download.php`, as that script
 needs an empty database.
 
-h3. `php download.php`
+### `php download.php`
 
 Run this to download the full available dataset from Joind.in.  It will provide
 some basic output along the way.  On my system it takes about 4 minutes, but 
 your download speed may vary.
 
-h3. `php derive.php`
+### `php derive.php`
 
 This script generates some derived data that is slow to calculate, and stores
 it in the database.  It generates no output when everything works properly.
 
-h3. `php report.php`
+### `php report.php`
 
 This script actually produces the report output. It produces a very simple HTML
 page called report.html, in the project root.  That's where all the useful 
 data can be seen. :-)
 
-h2. Contributing
------------------
+## Contributing
 
 Want to add another report?  PRs welcome. :-)
 
@@ -56,8 +53,7 @@ Keep using the same format and tool chain in `report()` as the existing code, fo
 consistency.  If you need to add more derived tables or columns, modify `derive.php`
 as needed, again keeping the same structure and pattern.
 
-h2. License
-------------
+## License
 
 This tool is copyright 2015 Larry Garfield and released under the MIT license.
 
